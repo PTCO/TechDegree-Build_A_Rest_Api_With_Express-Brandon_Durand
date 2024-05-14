@@ -23,7 +23,7 @@ app.use(morgan('dev'));
   await sequelize.authenticate();
   console.log('connection made');
 
-  await sequelize.sync({force: true});
+  await sequelize.sync();
 })()
 
 app.use(express.json())
