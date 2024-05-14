@@ -3,6 +3,11 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
+const { sequelize } = require('./models');
+
+// Imported Routes
+const Users = require('./routes/Users');
+const Courses = require('./routes/Courses');
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -13,12 +18,27 @@ const app = express();
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
+
+(async()=>{
+  await sequelize.authenticate();
+  console.log('connection made');
+
+  await sequelize.sync({force: true});
+})()
+
+app.use(express.json())
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
   res.json({
     message: 'Welcome to the REST API project!',
   });
 });
+
+//  Users Routes
+app.use('/api', Users);
+
+// Courses Routes
+app.use('/api', Courses);
 
 // send 404 if no other route matched
 app.use((req, res) => {
@@ -29,6 +49,12 @@ app.use((req, res) => {
 
 // setup a global error handler
 app.use((err, req, res, next) => {
+  if(err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError'){
+    const errors = err.errors.map( err => err.message);
+    return res.status(400).send(errors);
+  }
+
+
   if (enableGlobalErrorLogging) {
     console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
   }
