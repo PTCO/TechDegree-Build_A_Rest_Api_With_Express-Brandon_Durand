@@ -20,10 +20,11 @@ app.use(morgan('dev'));
 
 
 (async()=>{
-  await sequelize.authenticate();
-  console.log('connection made');
-
-  await sequelize.sync();
+  await sequelize.authenticate()
+  .then( ()=> console.log('connection to database successful'))
+  .catch( () => console.log('connection to database failed'))
+  
+  await sequelize.sync({force: true});
 })()
 
 app.use(express.json())

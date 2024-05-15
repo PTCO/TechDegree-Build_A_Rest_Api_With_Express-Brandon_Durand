@@ -48,8 +48,8 @@ Router.put('/courses/:id', authenticate, async (req, res, next)=>{
         const course = await Course.findOne({ where: {id: req.params.id } });
 
         let ownerCheckError = new Error('You do not own this course');
-        ownerCheckError.status = 403;
-        if(course.id !== req.currentUser.id) return next(ownerCheckError);
+        ownerCheckError.status = 401;
+        if(course.userId !== req.currentUser.id) return next(ownerCheckError);
 
         await Course.update(
             {
@@ -74,8 +74,8 @@ Router.delete('/courses/:id', authenticate, async (req, res, next)=>{
         const course = await Course.findOne({ where: {id: req.params.id } });
 
         let ownerCheckError = new Error('You do not own this course');
-        ownerCheckError.status = 403;
-        if(course.id !== req.currentUser.id) return next(ownerCheckError);
+        ownerCheckError.status = 401;
+        if(course.userId !== req.currentUser.id) return next(ownerCheckError);
 
         const deleteCourse = await Course.findByPk(req.params.id)
         await deleteCourse.destroy();
@@ -88,13 +88,13 @@ Router.delete('/courses/:id', authenticate, async (req, res, next)=>{
 Router.post('/courses', authenticate, async (req, res, next)=>{
     try {
         const course = await Course.create({
-            UserId: req.body.userId,
+            userId: req.body.userId,
             title: req.body.title,
             description: req.body.description,
             estimatedTime: req.body.estimatedTime,
             materialsNeeded: req.body.materialsNeeded,
         })
-        res.location('/api/courses/' + course.id).status(201).send();
+        res.location('/courses/' + course.id).status(201).send();
     } catch (error) {
         next(error)
     }

@@ -58,14 +58,21 @@ module.exports = (sequelize) => {
                 },
             },
             async set(val){
-                const hashedPwd = await bcrypt.hashSync(val, 10);
-                this.setDataValue('password', hashedPwd);
+                if(val !== ''){
+                    const hashedPwd = await bcrypt.hashSync(val, 10);
+                    this.setDataValue('password', hashedPwd);
+                }
             }            
         },
     }, {sequelize});
 
     Users.associate = (models) => {
-        Users.hasMany(models.Course)
+        Users.hasMany(models.Course, {
+            foreignKey: {
+                fieldName: 'userId',
+                allowNull: false
+            }
+        })
     }
 
     return Users;
