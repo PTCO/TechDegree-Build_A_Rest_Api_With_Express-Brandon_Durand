@@ -22,7 +22,9 @@ Router.get('/users', authenticate, async (req, res, next)=>{
 Router.post('/users', async (req, res, next)=>{
     try {
         
-        if(JSON.stringify(req.body) === '{}') throw Error('Please provide: first and last name, an valid email and password')
+        const incompleteError = new Error('Please provide: first and last name, an valid email and password')
+        incompleteError.status = 400;
+        if(JSON.stringify(req.body) === '{}') throw incompleteError;
 
         await User.create({
             firstName: req.body.firstName,

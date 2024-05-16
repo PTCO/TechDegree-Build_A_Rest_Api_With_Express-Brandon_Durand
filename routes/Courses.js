@@ -48,7 +48,7 @@ Router.put('/courses/:id', authenticate, async (req, res, next)=>{
         const course = await Course.findOne({ where: {id: req.params.id } });
 
         let ownerCheckError = new Error('You do not own this course');
-        ownerCheckError.status = 401;
+        ownerCheckError.status = 403;
         if(course.userId !== req.currentUser.id) return next(ownerCheckError);
 
         await Course.update(
@@ -74,7 +74,7 @@ Router.delete('/courses/:id', authenticate, async (req, res, next)=>{
         const course = await Course.findOne({ where: {id: req.params.id } });
 
         let ownerCheckError = new Error('You do not own this course');
-        ownerCheckError.status = 401;
+        ownerCheckError.status = 403;
         if(course.userId !== req.currentUser.id) return next(ownerCheckError);
 
         const deleteCourse = await Course.findByPk(req.params.id)
